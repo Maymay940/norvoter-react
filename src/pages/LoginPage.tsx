@@ -17,27 +17,38 @@ export const LoginPage = () => {
 
     try {
       const response = await login(username, password);
+    
+    // Добавьте console.log для отладки
+      console.log('Full response:', response);
+      console.log('Response data:', response.data);
+    
+    // Проверяем структуру ответа
       const result = response.data;
+    
       if (result.success) {
+        const userData = result;
+      
         localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userId', result.data.user_id);
-        localStorage.setItem('isAdmin', result.data.is_admin);
-        localStorage.setItem('username', result.data.username);
+        localStorage.setItem('userId', userData.user_id);
+        localStorage.setItem('isAdmin', userData.is_admin);
+        localStorage.setItem('username', userData.username);
         localStorage.setItem('user', JSON.stringify({
-          id: result.data.user_id,
-          username: result.data.username,
-          is_admin: result.data.is_admin,
+          id: userData.user_id,
+          username: userData.username,
+          is_admin: userData.is_admin,
         }));
+      
         navigate('/');
       } else {
         setError(result.error || 'Ошибка входа');
       }
-    } catch (err) {
-      setError('Ошибка соединения с сервером');
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Ошибка соединения с сервером');
     } finally {
       setLoading(false);
     }
-};
+  };
 
   return (
     <Container className="mt-5" style={{ maxWidth: '500px' }}>

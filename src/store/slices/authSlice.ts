@@ -79,9 +79,11 @@ const authSlice = createSlice({
     },
     restoreSession: (state) => {
       const savedUser = localStorage.getItem('user');
+      console.log('restoreSession called, savedUser:', savedUser);
       if (savedUser) {
         state.isAuthenticated = true;
         state.user = JSON.parse(savedUser);
+        console.log('Session restored:', state.user);
       }
     },
     updateUser: (state, action) => {

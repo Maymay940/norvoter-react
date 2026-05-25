@@ -67,7 +67,7 @@ export const deleteRequest = async (requestId: number) => {
 // НОВЫЕ МЕТОДЫ ДЛЯ АУТЕНТИФИКАЦИИ
 export const login = async (username: string, password: string) => {
   const response = await api.post('/users/login/', { username, password });
-  return response.data;
+  return response;
 };
 
 export const register = async (userData: {
