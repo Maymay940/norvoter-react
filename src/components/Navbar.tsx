@@ -4,10 +4,16 @@ import { logout } from '../services/api';
 
 export const Navbar = () => {
   const navigate = useNavigate();
-  const isAuthenticated = document.cookie.includes('sessionid');
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const username = localStorage.getItem('username') || '';
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
   const handleLogout = async () => {
     await logout();
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('isAdmin');
+    localStorage.removeItem('username');
     navigate('/login');
   };
 
@@ -18,12 +24,20 @@ export const Navbar = () => {
         <Nav className="me-auto">
           <Nav.Link as={Link} to="/">Счетчики</Nav.Link>
           <Nav.Link as={Link} to="/requests">Заявки</Nav.Link>
+          {isAdmin && (
+            <Nav.Link as={Link} to="/admin">Админ-панель</Nav.Link>
+          )}
         </Nav>
         <Nav>
           {isAuthenticated ? (
-            <Button variant="outline-light" size="sm" onClick={handleLogout}>
-              Выйти
-            </Button>
+            <>
+              <Nav.Link as={Link} to="/profile" className="text-light">
+                  {username}
+              </Nav.Link>
+              <Button variant="outline-light" size="sm" onClick={handleLogout}>
+                Выйти
+              </Button>
+            </>
           ) : (
             <>
               <Nav.Link as={Link} to="/login">Вход</Nav.Link>

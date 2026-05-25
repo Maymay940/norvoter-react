@@ -1,26 +1,50 @@
-import { useState, useEffect } from 'react';
-import { Container, Table, Badge, Button, Spinner } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import { getRequests } from '../services/api';
-import type { Request } from '../types/request';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';  
+import type { AppDispatch, RootState } from '../store';
+import { fetchRequests, completeRequest, rejectRequest, setFilters } from '../store/slices/requestsSlice';
+import { Table, Badge, Button, Form, Row, Col, Spinner } from 'react-bootstrap';
 
 export const RequestsPage = () => {
-  const [requests, setRequests] = useState<Request[]>([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();  
+  const { items: requests, loading, filters } = useSelector((state: RootState) => state.requests);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [dateFrom, setDateFrom] = useState(filters.date_from);
+  const [dateTo, setDateTo] = useState(filters.date_to);
+  const [statusFilter, setStatusFilter] = useState(filters.status);
+
+  const loadRequests = () => {
+    dispatch(fetchRequests({ status: statusFilter, date_from: dateFrom, date_to: dateTo }));
+  };
 
   useEffect(() => {
     loadRequests();
-  }, []);
+    const interval = setInterval(() => {
+      loadRequests();
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [dateFrom, dateTo, statusFilter]);
 
-  const loadRequests = async () => {
-    try {
-      const data = await getRequests() as Request[];
-      setRequests(data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+  const handleFilter = () => {
+    dispatch(setFilters({ status: statusFilter, date_from: dateFrom, date_to: dateTo }));
+    loadRequests();
+  };
+
+  const handleComplete = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();  // предотвращает переход на детали
+    await dispatch(completeRequest(id));
+    loadRequests();
+  };
+
+  const handleReject = async (id: number, e: React.MouseEvent) => {
+    e.stopPropagation();  // предотвращает переход на детали
+    await dispatch(rejectRequest(id));
+    loadRequests();
+  };
+
+  const handleRowClick = (id: number) => {
+    navigate(`/requests/${id}`);  // переход на детали заявки
   };
 
   const getStatusBadge = (status: string) => {
@@ -29,45 +53,103 @@ export const RequestsPage = () => {
       submitted: 'info',
       completed: 'success',
       rejected: 'danger',
-      deleted: 'dark',
     };
     return <Badge bg={variants[status] || 'secondary'}>{status}</Badge>;
   };
 
-
-  if (loading) return <Container className="mt-5 text-center"><Spinner animation="border" /></Container>;
+  if (loading && requests.length === 0) {
+    return <div className="text-center mt-5"><Spinner animation="border" /></div>;
+  }
 
   return (
-    <Container className="mt-4">
-      <h1 className="mb-4">Все заявки</h1>
+    <div className="container mt-4">
+      <h1>Заявки</h1>
+
+      {/* Фильтры */}
+      <Row className="mb-4">
+        <Col md={3}>
+          <Form.Control
+            type="date"
+            value={dateFrom}
+            onChange={(e) => setDateFrom(e.target.value)}
+            placeholder="Дата от"
+          />
+        </Col>
+        <Col md={3}>
+          <Form.Control
+            type="date"
+            value={dateTo}
+            onChange={(e) => setDateTo(e.target.value)}
+            placeholder="Дата до"
+          />
+        </Col>
+        <Col md={3}>
+          <Form.Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+            <option value="">Все статусы</option>
+            <option value="draft">Черновик</option>
+            <option value="submitted">Отправлено</option>
+            <option value="completed">Завершено</option>
+            <option value="rejected">Отклонено</option>
+          </Form.Select>
+        </Col>
+        <Col md={3}>
+          <Button variant="primary" onClick={handleFilter}>
+            Применить
+          </Button>
+        </Col>
+      </Row>
+
       <Table striped bordered hover>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>№</th>
             <th>Статус</th>
             <th>Дата создания</th>
-            <th>Счетчиков</th>
+            <th>Дата отправки</th>
+            <th>Кол-во</th>
             <th>Сумма</th>
-            <th>Действия</th>
+            {user?.is_admin && <th>Действия</th>}
           </tr>
         </thead>
         <tbody>
           {requests.map((req) => (
-            <tr key={req.id}>
+            <tr 
+              key={req.id} 
+              onClick={() => handleRowClick(req.id)}
+              style={{ cursor: 'pointer' }}
+              className="request-row"
+            >
               <td>{req.id}</td>
               <td>{getStatusBadge(req.status)}</td>
               <td>{req.created_at}</td>
+              <td>{req.submitted_at || '-'}</td>
               <td>{req.positions_count}</td>
               <td>{req.amount_to_pay ? `${req.amount_to_pay} ₽` : '-'}</td>
-              <td>
-                <Link to={`/requests/${req.id}`}>
-                  <Button variant="primary" size="sm">Подробнее</Button>
-                </Link>
-              </td>
+              {user?.is_admin && req.status === 'submitted' && (
+                <td onClick={(e) => e.stopPropagation()}>
+                  <Button 
+                    size="sm" 
+                    variant="success" 
+                    onClick={(e) => handleComplete(req.id, e)}
+                    className="me-1"
+                  >
+                    Завершить
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="danger" 
+                    onClick={(e) => handleReject(req.id, e)}
+                  >
+                    Отклонить
+                  </Button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>
       </Table>
-    </Container>
+    </div>
   );
 };
+
+export default RequestsPage;

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Container, Card, Form, Button, Alert } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
-import { login } from '../services/api';
+import { login } from '../services/api'; 
 
 export const LoginPage = () => {
   const navigate = useNavigate();
@@ -16,8 +16,18 @@ export const LoginPage = () => {
     setError('');
 
     try {
-      const result = await login(username, password);
+      const response = await login(username, password);
+      const result = response.data;
       if (result.success) {
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userId', result.data.user_id);
+        localStorage.setItem('isAdmin', result.data.is_admin);
+        localStorage.setItem('username', result.data.username);
+        localStorage.setItem('user', JSON.stringify({
+          id: result.data.user_id,
+          username: result.data.username,
+          is_admin: result.data.is_admin,
+        }));
         navigate('/');
       } else {
         setError(result.error || 'Ошибка входа');
@@ -27,7 +37,7 @@ export const LoginPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+};
 
   return (
     <Container className="mt-5" style={{ maxWidth: '500px' }}>
@@ -66,3 +76,5 @@ export const LoginPage = () => {
     </Container>
   );
 };
+
+export default LoginPage;

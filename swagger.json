@@ -1,0 +1,409 @@
+openapi: 3.0.3
+info:
+  title: Norvoter API
+  version: 1.0.0
+  description: API для учёта показаний счётчиков воды
+paths:
+  /api/cart/:
+    get:
+      operationId: cart_retrieve
+      tags:
+      - cart
+      responses:
+        '200':
+          description: No response body
+  /api/free-accounts/:
+    get:
+      operationId: free_accounts_retrieve
+      description: GET список лицевых счетов, не привязанных к пользователю
+      tags:
+      - free-accounts
+      responses:
+        '200':
+          description: No response body
+  /api/meters/:
+    get:
+      operationId: meters_retrieve
+      tags:
+      - meters
+      responses:
+        '200':
+          description: Список счетчиков
+        '401':
+          description: Не авторизован
+  /api/meters/{meter_id}/:
+    get:
+      operationId: meters_retrieve_2
+      parameters:
+      - in: path
+        name: meter_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - meters
+      responses:
+        '200':
+          description: No response body
+  /api/meters/add/:
+    post:
+      operationId: meters_add_create
+      tags:
+      - meters
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MeterAddRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MeterAddRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MeterAddRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/positions/{position_id}/delete/:
+    delete:
+      operationId: positions_delete_destroy
+      parameters:
+      - in: path
+        name: position_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - positions
+      responses:
+        '204':
+          description: No response body
+  /api/positions/{position_id}/update/:
+    put:
+      operationId: positions_update_update
+      parameters:
+      - in: path
+        name: position_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - positions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PositionUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PositionUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PositionUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/positions/add/:
+    post:
+      operationId: positions_add_create
+      tags:
+      - positions
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PositionAddRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PositionAddRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PositionAddRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+  /api/requests/:
+    get:
+      operationId: requests_retrieve
+      tags:
+      - requests
+      responses:
+        '200':
+          description: No response body
+  /api/requests/{request_id}/:
+    get:
+      operationId: requests_retrieve_2
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - requests
+      responses:
+        '200':
+          description: No response body
+  /api/requests/{request_id}/complete/:
+    put:
+      operationId: requests_complete_update
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - requests
+      responses:
+        '200':
+          description: No response body
+  /api/requests/{request_id}/delete/:
+    delete:
+      operationId: requests_delete_destroy
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - requests
+      responses:
+        '204':
+          description: No response body
+  /api/requests/{request_id}/reject/:
+    put:
+      operationId: requests_reject_update
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - requests
+      responses:
+        '200':
+          description: No response body
+  /api/requests/{request_id}/submit-request/:
+    put:
+      operationId: requests_submit_request_update
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - requests
+      responses:
+        '200':
+          description: No response body
+  /api/requests/{request_id}/update/:
+    put:
+      operationId: requests_update_update
+      parameters:
+      - in: path
+        name: request_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - requests
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RequestUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RequestUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RequestUpdateRequest'
+      responses:
+        '200':
+          description: No response body
+  /api/users/login/:
+    post:
+      operationId: users_login_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Login'
+          description: Успешный вход
+        '400':
+          description: Ошибка
+        '401':
+          description: Неверный пароль
+  /api/users/logout/:
+    post:
+      operationId: users_logout_create
+      tags:
+      - users
+      responses:
+        '200':
+          description: No response body
+  /api/users/register/:
+    post:
+      operationId: users_register_create
+      tags:
+      - users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Login:
+      type: object
+      properties:
+        username:
+          type: string
+          maxLength: 100
+      required:
+      - username
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+        password:
+          type: string
+          writeOnly: true
+          minLength: 1
+          maxLength: 255
+      required:
+      - password
+      - username
+    MeterAddRequest:
+      type: object
+      properties:
+        address:
+          type: string
+          minLength: 1
+          maxLength: 255
+        serial_number:
+          type: string
+          minLength: 1
+          maxLength: 50
+        meter_type:
+          $ref: '#/components/schemas/MeterTypeEnum'
+        meter_model:
+          type: string
+          minLength: 1
+          maxLength: 100
+        installation_date:
+          type: string
+          format: date
+        initial_reading:
+          type: integer
+          default: 0
+        last_verified_reading:
+          type: integer
+          default: 0
+      required:
+      - address
+      - installation_date
+      - meter_model
+      - meter_type
+      - serial_number
+    MeterTypeEnum:
+      enum:
+      - HOT
+      - COLD
+      type: string
+      description: |-
+        * `HOT` - HOT
+        * `COLD` - COLD
+    PositionAddRequest:
+      type: object
+      properties:
+        meter_id:
+          type: integer
+        current_reading:
+          type: integer
+        request_id:
+          type: integer
+          nullable: true
+      required:
+      - current_reading
+      - meter_id
+    PositionUpdateRequest:
+      type: object
+      properties:
+        current_reading:
+          type: integer
+      required:
+      - current_reading
+    RegisterRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+          maxLength: 255
+        account_number:
+          type: string
+          minLength: 1
+          maxLength: 50
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        phone:
+          type: string
+          maxLength: 20
+      required:
+      - account_number
+      - email
+      - password
+      - username
+    RequestUpdateRequest:
+      type: object
+      properties:
+        comment:
+          type: string

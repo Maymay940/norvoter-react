@@ -868,3 +868,562 @@ a {
     flex: 1;
     text-align: center;
 }
+
+/* Кнопки действий в таблице */
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 20px;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    margin: 0 4px;
+    background-color: var(--primary-blue);
+    color: var(--white);
+    border: none;
+    cursor: pointer;
+}
+
+.btn-sm:first-child {
+    margin-left: 0;
+}
+
+.btn-sm:last-child {
+    margin-right: 0;
+}
+
+.btn-sm:hover {
+    background-color: #0b4ad1;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Кнопка "Применить" в фильтрах */
+.btn-primary {
+    background-color: var(--primary-blue);
+    border: none;
+    padding: 8px 20px;
+    font-weight: 500;
+    border-radius: 12px;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: #0b4ad1;
+    transform: translateY(-1px);
+}
+
+/* Кнопка "Подать показания" */
+.btn-success {
+    background-color: var(--primary-blue);
+    border: none;
+    padding: 10px 24px;
+    font-weight: 500;
+    border-radius: 12px;
+    color: var(--white);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-success:hover {
+    background-color: #0b4ad1;
+    transform: translateY(-1px);
+}
+
+/* Кнопка "Добавить счётчик" */
+.btn-primary {
+    background-color: var(--primary-blue);
+}
+
+/* Кнопки в карточках счётчиков */
+.btn-compact {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    width: 100%;
+    cursor: pointer;
+}
+
+.btn-compact:hover {
+    background-color: #0b4ad1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопка "редактировать заявку" и другие */
+.btn-secondary {
+    background-color: transparent;
+    border: 2px solid var(--primary-blue);
+    color: var(--primary-blue);
+    padding: 8px 20px;
+    border-radius: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(14, 87, 231, 0.08);
+    transform: translateY(-1px);
+}
+
+/* Группа кнопок в строке таблицы */
+td .btn-sm {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Статус-бейджи в таблице заявок */
+.badge {
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 30px;
+}
+
+/* Таблица заявок */
+.table {
+    background-color: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.table thead th {
+    background-color: var(--gray-200);
+    color: var(--text-primary);
+    font-weight: 600;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.table tbody td {
+    padding: 12px 16px;
+    vertical-align: middle;
+    color: var(--text-primary);
+}
+
+/* Анимация загрузки */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+    color: var(--primary-blue);
+}
+
+/* Панель фильтров */
+.filters-panel {
+    background-color: var(--white);
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--gray-200);
+}
+
+/* Кнопки в карточке заявки */
+.request-actions .btn {
+    min-width: 160px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+    .btn-sm {
+        padding: 4px 8px;
+        font-size: 11px;
+        margin: 2px;
+    }
+    
+    .request-actions .btn {
+        min-width: auto;
+        width: 100%;
+        margin-bottom: 8px;
+    }
+    
+    .request-actions {
+        flex-direction: column;
+    }
+    
+    .table thead th,
+    .table tbody td {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+    
+    td .btn-sm {
+        display: flex;
+        margin: 4px 0;
+    }
+}
+
+/* ======================================== */
+/* ДОПОЛНИТЕЛЬНАЯ АДАПТИВНОСТЬ ДЛЯ LAB 8 */
+/* ======================================== */
+
+/* --- Для планшетов (768px - 1024px) --- */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .requests-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+  
+  .container {
+    padding: 0 16px;
+  }
+  
+  .page-title {
+    font-size: 32px;
+    margin-bottom: 24px;
+  }
+  
+  .meter-card {
+    padding: 20px;
+  }
+  
+  .info-line {
+    font-size: 16px;
+  }
+  
+  .info-label {
+    width: 160px;
+  }
+}
+
+/* --- Для больших телефонов (480px - 768px) --- */
+@media (min-width: 481px) and (max-width: 768px) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    padding: 0 12px;
+  }
+  
+  .requests-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .container {
+    padding: 0 12px;
+  }
+  
+  .page-title {
+    font-size: 28px;
+    margin-bottom: 20px;
+  }
+  
+  .search-section {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  
+  .search-input {
+    font-size: 18px;
+    padding: 8px 0;
+  }
+  
+  .search-button {
+    padding: 8px 16px;
+  }
+  
+  .meter-card-compact,
+  .request-card-compact {
+    padding: 14px;
+  }
+  
+  .compact-title {
+    font-size: 16px;
+  }
+  
+  .compact-address {
+    font-size: 13px;
+  }
+  
+  .request-id {
+    font-size: 16px;
+    max-width: 120px;
+  }
+  
+  .request-status-badge {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+  
+  .meter-card {
+    flex-direction: column;
+    padding: 16px;
+  }
+  
+  .card__image-col {
+    width: 100%;
+    max-width: 200px;
+    margin: 0 auto;
+  }
+  
+  .reading-section {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .reading-input-col,
+  .reading-stats-col {
+    width: 100%;
+  }
+  
+  .stats-value {
+    font-size: 24px;
+  }
+  
+  .request-view-card {
+    padding: 16px;
+    margin: 0 8px;
+  }
+  
+  .request-meters-list {
+    gap: 12px;
+  }
+  
+  .meter-address {
+    font-size: 14px;
+    min-width: auto;
+  }
+  
+  .meter-readings {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .reading-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
+  .request-totals {
+    padding: 16px;
+  }
+  
+  .total-value.large {
+    font-size: 20px;
+  }
+  
+  .request-actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .btn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* --- Для маленьких телефонов (до 480px) --- */
+@media (max-width: 480px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 0 8px;
+  }
+  
+  .requests-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .container {
+    padding: 0 8px;
+  }
+  
+  .page-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .search-section {
+    width: 100%;
+    margin-bottom: 20px;
+  }
+  
+  .search-field {
+    padding: 4px 4px 4px 16px;
+  }
+  
+  .search-input {
+    font-size: 16px;
+    padding: 8px 0;
+  }
+  
+  .search-button {
+    padding: 8px 12px;
+  }
+  
+  .meter-card-compact,
+  .request-card-compact {
+    padding: 12px;
+  }
+  
+  .compact-title {
+    font-size: 15px;
+  }
+  
+  .compact-address {
+    font-size: 12px;
+  }
+  
+  .compact-days {
+    font-size: 18px;
+  }
+  
+  .btn-compact {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .request-id {
+    font-size: 14px;
+    max-width: 100px;
+  }
+  
+  .request-status-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+  }
+  
+  .meter-card {
+    padding: 12px;
+  }
+  
+  .info-line {
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .info-label {
+    width: auto;
+    font-size: 14px;
+  }
+  
+  .info-value {
+    font-size: 14px;
+  }
+  
+  .reading-input {
+    font-size: 16px;
+    padding: 8px 12px;
+  }
+  
+  .stats-label {
+    font-size: 14px;
+  }
+  
+  .stats-value {
+    font-size: 20px;
+  }
+  
+  .request-view-card {
+    padding: 12px;
+    margin: 0 4px;
+  }
+  
+  .request-info {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .info-row {
+    font-size: 14px;
+  }
+  
+  .meter-address {
+    font-size: 13px;
+  }
+  
+  .reading-item {
+    font-size: 13px;
+  }
+  
+  .request-totals {
+    padding: 12px;
+  }
+  
+  .total-row {
+    font-size: 14px;
+  }
+  
+  .total-value.large {
+    font-size: 18px;
+  }
+  
+  .btn {
+    padding: 8px 16px;
+    font-size: 16px;
+  }
+  
+  .empty-state {
+    padding: 30px;
+  }
+  
+  .empty-state p {
+    font-size: 16px;
+  }
+}
+
+/* --- Альбомная ориентация на телефонах --- */
+@media (max-width: 850px) and (orientation: landscape) {
+  .cards-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .meter-card {
+    flex-direction: row;
+  }
+  
+  .card__image-col {
+    width: 40%;
+  }
+  
+  .page-title {
+    font-size: 28px;
+  }
+  
+  .main {
+    padding: 20px 0;
+  }
+}
+
+/* --- Для больших экранов (1440px+) --- */
+@media (min-width: 1440px) {
+  .container {
+    max-width: 1400px;
+  }
+  
+  .cards-grid,
+  .requests-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 24px;
+  }
+  
+  .meter-card-compact,
+  .request-card-compact {
+    padding: 20px;
+  }
+  
+  .compact-title {
+    font-size: 20px;
+  }
+  
+  .page-title {
+    font-size: 56px;
+  }
+}

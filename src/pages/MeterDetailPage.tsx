@@ -1,12 +1,17 @@
+// src/pages/MeterDetailPage.tsx
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Image, Button, Form, Spinner, Alert } from 'react-bootstrap';
-import { getMeters, createRequest } from '../services/api';
-import type { Meter } from '../types/meter';
+import { useDispatch } from 'react-redux';
+import type { AppDispatch } from '../store';
+import { fetchMeters } from '../store/slices/metersSlice';
+import { addToRequest, fetchCart } from '../store/slices/requestSlice';
+import type { Meter } from '../store/slices/metersSlice';
+import { Button, Spinner, Alert } from 'react-bootstrap';
 
 export const MeterDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const [meter, setMeter] = useState<Meter | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -17,8 +22,8 @@ export const MeterDetailPage = () => {
   useEffect(() => {
     const loadMeter = async () => {
       try {
-        const meters = await getMeters();
-        const found = meters.find(m => m.id === Number(id));
+        const meters = await dispatch(fetchMeters()).unwrap();
+        const found = meters.find((m: Meter) => m.id === Number(id));
         if (found) {
           setMeter(found);
         } else {
@@ -31,9 +36,8 @@ export const MeterDetailPage = () => {
       }
     };
     loadMeter();
-  }, [id]);
+  }, [id, dispatch]);
 
-  // расчет расхода при вводе показаний
   const handleReadingChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
     setReading(e.target.value);
@@ -50,14 +54,16 @@ export const MeterDetailPage = () => {
 
     setSubmitting(true);
     try {
-      const result = await createRequest(meter.id, parseInt(reading));
+      const result = await dispatch(addToRequest({ 
+        meter_id: meter.id, 
+        current_reading: parseInt(reading) 
+      })).unwrap();
+      await dispatch(fetchCart());
       if (result.request_id) {
         navigate(`/requests/${result.request_id}`);
-      } else {
-        setError('Ошибка при создании заявки');
       }
     } catch (err) {
-      setError('Ошибка соединения с сервером');
+      setError('Ошибка при создании заявки');
     } finally {
       setSubmitting(false);
     }
@@ -65,93 +71,117 @@ export const MeterDetailPage = () => {
 
   if (loading) {
     return (
-      <Container className="text-center mt-5">
+      <div className="text-center mt-5">
         <Spinner animation="border" variant="primary" />
-      </Container>
+      </div>
     );
   }
 
   if (error || !meter) {
     return (
-      <Container className="mt-4">
+      <div className="container mt-4">
         <Alert variant="danger">{error || 'Счетчик не найден'}</Alert>
         <Button variant="primary" onClick={() => navigate('/')}>На главную</Button>
-      </Container>
+      </div>
     );
   }
 
   return (
-    <Container className="mt-4">
-      <Button variant="link" onClick={() => navigate(-1)} className="mb-3">
-        ← Назад
-      </Button>
+    <div className="app">
+      <main className="main">
+        <div className="container">
+          <div className="page-header">
+            <h1 className="page-title">{meter.address}</h1>
+          </div>
 
-      <h1 className="mb-4">{meter.address}</h1>
-
-      <Row>
-        <Col md={6}>
-          <Image
-            src={meter.photo_url || '/default-meter.jpg'}
-            fluid
-            rounded
-            className="mb-3"
-          />
-          {meter.setup_video_url && (
-            <div className="mt-3">
-              <video controls className="w-100" style={{ borderRadius: '8px' }}>
-                <source src={meter.setup_video_url} type="video/mp4" />
-                Ваш браузер не поддерживает видео.
-              </video>
+          <div className="meter-card">
+            <div className="card__image-col">
+              {meter.photo_url ? (
+                <img src={meter.photo_url} alt={`Счетчик ${meter.serial_number}`} className="meter-photo" />
+              ) : (
+                <img src="/default-meter.jpg" alt="Нет фото" className="meter-photo" />
+              )}
+              
+              {meter.setup_video_url && (
+                <div className="video-section">
+                  <video className="meter-video" autoPlay muted loop playsInline>
+                    <source src={meter.setup_video_url} type="video/mp4" />
+                  </video>
+                </div>
+              )}
             </div>
-          )}
-        </Col>
-        <Col md={6}>
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Title>{meter.meter_model} №{meter.serial_number}</Card.Title>
-              <Card.Text>
-                <strong>Тип:</strong> {meter.meter_type === 'HOT' ? 'Горячая вода' : 'Холодная вода'}<br />
-                <strong>Дата установки:</strong> {meter.installation_date}<br />
-                <strong>Последние показания:</strong> {meter.last_verified_reading} м³
-              </Card.Text>
-            </Card.Body>
-          </Card>
 
-          <Card>
-            <Card.Body>
-              <Card.Title className="mb-3">Передать показания</Card.Title>
-              <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Текущие показания (м³)</Form.Label>
-                  <Form.Control
-                    type="number"
-                    value={reading}
-                    onChange={handleReadingChange}
-                    placeholder="Введите показания"
-                    min={meter.last_verified_reading}
-                    required
-                  />
-                </Form.Group>
+            <div className="card__content-col">
+              <div className="info-block">
+                <div className="info-line">
+                  <span className="info-label">Модель:</span>
+                  <span className="info-value">{meter.meter_model} (№{meter.serial_number})</span>
+                </div>
+                <div className="info-line">
+                  <span className="info-label">Тип:</span>
+                  <span className="info-value">{meter.meter_type === 'HOT' ? 'Горячая вода' : 'Холодная вода'}</span>
+                </div>
+                <div className="info-line">
+                  <span className="info-label">Дата установки:</span>
+                  <span className="info-value">{meter.installation_date}</span>
+                </div>
+                <div className="info-line">
+                  <span className="info-label">Последние показания:</span>
+                  <span className="info-value">{meter.last_verified_reading} м³ (подтверждено)</span>
+                </div>
+              </div>
 
-                {consumption !== null && (
-                  <Alert variant="info" className="mt-2">
-                    Расход в этом месяце: <strong>{consumption} м³</strong>
-                  </Alert>
+              <form onSubmit={handleSubmit} className="reading-form">
+                <input type="hidden" name="meter_id" value={meter.id} />
+
+                <div className="reading-section">
+                  <div className="reading-input-col">
+                    <label htmlFor="current_reading" className="reading-label">Текущие показания:</label>
+                    <input
+                      type="number"
+                      id="current_reading"
+                      name="current_reading"
+                      className="reading-input"
+                      placeholder="Введите показания"
+                      min={meter.last_verified_reading}
+                      value={reading}
+                      onChange={handleReadingChange}
+                      required
+                    />
+                  </div>
+
+                  <div className="reading-stats-col">
+                    <div className="previous-reading">
+                      <span className="stats-label">Предыдущие показания:</span>
+                      <span className="previous-value">{meter.last_verified_reading} м³</span>
+                    </div>
+                    <div className="calculated-consumption" id="consumption-display">
+                      <span className="stats-label">Расход в этом месяце:</span>
+                      <span className="stats-value" id="consumption-value">
+                        {consumption !== null ? `${consumption} м³` : '-- м³'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {error && (
+                  <div className="error-message" style={{ color: 'red', margin: '10px 0' }}>
+                    {error}
+                  </div>
                 )}
 
-                <Button
-                  type="submit"
-                  variant="success"
-                  className="w-100"
-                  disabled={submitting || !reading || consumption === null}
-                >
-                  {submitting ? 'Отправка...' : 'Передать показания'}
-                </Button>
-              </Form>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-    </Container>
+                <div className="card__actions">
+                  <button type="submit" className="btn btn-primary" disabled={submitting}>
+                    {submitting ? 'Отправка...' : 'передать показания'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
   );
 };
+
+export default MeterDetailPage;

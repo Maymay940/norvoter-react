@@ -1,81 +1,144 @@
-import { useState, useEffect } from 'react';
-import { Container, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
+import { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useDispatch, useSelector } from 'react-redux';
+import { Spinner, Badge, Form } from 'react-bootstrap';
 import { MeterCard } from '../components/MeterCard';
 import { VideoBackground } from '../components/VideoBackground';
 import { getMeters } from '../services/api';
-import type { Meter } from '../types/meter';
+import type { RootState } from '../store';
+import { setAddress, setMeterType, setSortBy } from '../store/slices/filtersSlice';
 
 export const MetersPage = () => {
-  const [meters, setMeters] = useState<Meter[]>([]);
-  const [searchAddress, setSearchAddress] = useState('');
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const dispatch = useDispatch();
+  const { address, meterType, sortBy } = useSelector((state: RootState) => state.filters);
+  const [localSearch, setLocalSearch] = useState(address);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    loadMeters();
-  }, []);
+  const { data: meters = [], isLoading, isFetching, error, status } = useQuery({
+    queryKey: ['meters', address],
+    queryFn: () => getMeters(address),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
 
-  const loadMeters = async (address?: string) => {
-    setLoading(true);
-    setError('');
-    try {
-      const data = await getMeters(address);
-      setMeters(data);
-    } catch (err) {
-      setError('Ошибка загрузки данных');
-      console.error(err);
-    } finally {
-      setLoading(false);
+  const isFromCache = status === 'success' && !isFetching;
+  const isRefreshing = isFetching && !isLoading;
+
+  const handleSearch = () => {
+    dispatch(setAddress(localSearch));
+    queryClient.invalidateQueries({ queryKey: ['meters'] });
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleSearch();
     }
   };
 
-  const handleSearch = () => {
-    loadMeters(searchAddress);
-  };
+  // Фильтрация и сортировка на фронте
+  const filteredMeters = (meters || [])
+    .filter(m => address === '' || m.address.toLowerCase().includes(address.toLowerCase()))
+    .filter(m => meterType === 'all' || m.meter_type === meterType)
+    .sort((a, b) => {
+      if (sortBy === 'address') {
+        return a.address.localeCompare(b.address);
+      } else {
+        return b.last_verified_reading - a.last_verified_reading;
+      }
+    });
 
-  if (loading) {
+  if (isLoading) {
     return (
-      <Container className="text-center mt-5">
+      <div className="text-center mt-5">
         <Spinner animation="border" variant="primary" />
-      </Container>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-center mt-5">
+        <div className="alert alert-danger">Ошибка загрузки данных</div>
+      </div>
     );
   }
 
   return (
     <>
       <VideoBackground />
-      <Container className="mt-4">
-        <div className="page-header">
-          <h1 className="page-title page-title-light">Счетчики воды</h1>
-        </div>
+      <div className="app">
+        <main className="main">
+          <div className="container">
+            <div className="page-header">
+              <div className="d-flex justify-content-between align-items-center flex-wrap">
+                <h1 className="page-title page-title-light">Счетчики воды</h1>
+                <div className="d-flex gap-2">
+                  {/* Фильтр по типу */}
+                  <Form.Select 
+                    value={meterType} 
+                    onChange={(e) => dispatch(setMeterType(e.target.value as any))}
+                    style={{ width: '120px' }}
+                    className="bg-dark text-white"
+                  >
+                    <option value="all">Все типы</option>
+                    <option value="HOT">ГВС</option>
+                    <option value="COLD">ХВС</option>
+                  </Form.Select>
+                  
+                  {/* Сортировка */}
+                  <Form.Select 
+                    value={sortBy} 
+                    onChange={(e) => dispatch(setSortBy(e.target.value as any))}
+                    style={{ width: '160px' }}
+                    className="bg-dark text-white"
+                  >
+                    <option value="address">По адресу</option>
+                    <option value="last_reading">По показаниям</option>
+                  </Form.Select>
+                  
+                  {isRefreshing && <Spinner animation="border" size="sm" className="me-2" />}
+                  {isFromCache && !isRefreshing && (
+                    <Badge bg="success" pill className="ms-2">
+                      Кэш
+                    </Badge>
+                  )}
+                </div>
+              </div>
+            </div>
 
-        <div className="search-section search-section-transparent">
-          <div className="search-field search-field-light">
-            <input
-              type="text"
-              className="search-input search-input-light"
-              placeholder="Найти по адресу..."
-              value={searchAddress}
-              onChange={(e) => setSearchAddress(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-            />
-            <button className="search-button search-button-light" onClick={handleSearch}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2"/>
-                <path d="M16 16L21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
-            </button>
+            <div className="search-section search-section-transparent">
+              <div className="search-field search-field-light">
+                <input
+                  type="text"
+                  className="search-input search-input-light"
+                  placeholder="Найти по адресу..."
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                />
+                <button className="search-button search-button-light" onClick={handleSearch}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2"/>
+                    <path d="M16 16L21 21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div className="cards-grid">
+              {filteredMeters.map((meter) => (
+                <MeterCard key={meter.id} meter={meter} />
+              ))}
+            </div>
+            
+            {filteredMeters.length === 0 && (
+              <div className="text-center mt-5">
+                <p className="text-light">Ничего не найдено</p>
+              </div>
+            )}
           </div>
-        </div>
-
-        {error && <div className="alert alert-danger">{error}</div>}
-
-        <div className="cards-grid">
-          {meters.map((meter) => (
-            <MeterCard key={meter.id} meter={meter} />
-          ))}
-        </div>
-      </Container>
+        </main>
+      </div>
     </>
   );
 };
