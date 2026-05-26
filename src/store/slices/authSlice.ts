@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // Определяем режим GitHub Pages
-const isGitHubPages = import.meta.env.MODE === 'production';
+const isGitHubPages = true;
 
 console.log('isGitHubPages =', import.meta.env.VITE_IS_GITHUB_PAGES);
 console.log('MODE =', import.meta.env.MODE);
