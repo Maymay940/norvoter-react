@@ -4,7 +4,7 @@ import * as mockApi from './mockApi';
 import type { Meter } from '../types/meter';
 
 // Переключение режимов
-const USE_MOCK = true;  // ← true для GitHub Pages, false для локальной разработки
+const USE_MOCK = false;  // ← true для GitHub Pages, false для локальной разработки
 
 export const login = async (username: string, password: string) => {
   if (USE_MOCK) return mockApi.mockLogin(username, password);
