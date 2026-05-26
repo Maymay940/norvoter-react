@@ -107,3 +107,20 @@ export const getCurrentUser = () => {
   const user = localStorage.getItem('user');
   return user ? JSON.parse(user) : null;
 };
+
+export const register = async (userData: {
+  username: string;
+  email: string;
+  password: string;
+  account_number: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+}) => {
+  if (USE_MOCK) {
+    const response = await mockApi.mockRegister(userData);
+    return response;
+  }
+  const response = await axios.post('/api/users/register/', userData);
+  return response.data;
+};

@@ -178,5 +178,55 @@ export const mockDeleteRequest = async (requestId: number) => {
   return { success: true };
 };
 
+export const mockRegister = async (userData: {
+  username: string;
+  email: string;
+  password: string;
+  account_number: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+}) => {
+  await delay();
+  
+  // Проверка существующего пользователя
+  const existingUser = mockUsers.find(u => u.username === userData.username);
+  if (existingUser) {
+    return { success: false, error: 'Пользователь с таким именем уже существует' };
+  }
+  
+  // Создаем нового пользователя
+  const newUser = {
+    id: mockUsers.length + 1,
+    username: userData.username,
+    password: userData.password,
+    is_admin: false,
+    account_number: userData.account_number,
+    first_name: userData.first_name || '',
+    last_name: userData.last_name || '',
+    phone: userData.phone || '',
+    email: userData.email || '',
+  };
+  
+  mockUsers.push(newUser);
+  
+  // Автоматически логиним после регистрации
+  currentUser = { ...newUser };
+  delete currentUser.password;
+  
+  return { 
+    success: true, 
+    data: {
+      user_id: newUser.id,
+      username: newUser.username,
+      is_admin: newUser.is_admin,
+      first_name: newUser.first_name,
+      last_name: newUser.last_name,
+      phone: newUser.phone,
+      email: newUser.email,
+    }
+  };
+};
+
 export const isMockAuthenticated = () => currentUser !== null;
 export const getMockCurrentUser = () => currentUser;
