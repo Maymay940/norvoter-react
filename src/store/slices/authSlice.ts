@@ -240,6 +240,7 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Логин
       .addCase(login.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -252,40 +253,47 @@ const authSlice = createSlice({
           id: userData.user_id,
           username: userData.username,
           is_admin: userData.is_admin,
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          phone: userData.phone,
-          email: userData.email,
+          first_name: userData.first_name || '',
+          last_name: userData.last_name || '',
+          phone: userData.phone || '',
+          email: userData.email || '',
         };
         localStorage.setItem('user', JSON.stringify(state.user));
+        console.log('Login successful, user saved:', state.user);
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Ошибка входа';
+        console.error('Login failed:', action.error);
       })
+      // Регистрация
       .addCase(register.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(register.fulfilled, (state, action) => {
         state.loading = false;
-        // После регистрации не авторизуем автоматически
         console.log('Registration successful:', action.payload);
       })
       .addCase(register.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Ошибка регистрации';
+        console.error('Registration failed:', action.error);
       })
+      // Логаут
       .addCase(logout.fulfilled, (state) => {
         state.isAuthenticated = false;
         state.user = null;
         localStorage.removeItem('user');
+        console.log('Logout successful');
       })
+      // Проверка сессии
       .addCase(checkSession.fulfilled, (state, action) => {
         const savedUser = action.payload;
         if (savedUser) {
           state.isAuthenticated = true;
           state.user = savedUser;
+          console.log('Session check successful:', savedUser);
         }
       })
       .addCase(checkSession.rejected, (state) => {
@@ -294,21 +302,27 @@ const authSlice = createSlice({
           state.user = null;
           localStorage.removeItem('user');
         }
+        console.log('Session check failed');
       })
+      // Обновление профиля
       .addCase(updateProfile.fulfilled, (state, action) => {
         if (state.user) {
           state.user = { ...state.user, ...action.payload };
           localStorage.setItem('user', JSON.stringify(state.user));
+          console.log('Profile updated:', state.user);
         }
       })
       .addCase(updateProfile.rejected, (state, action) => {
         state.error = action.error.message || 'Ошибка обновления профиля';
+        console.error('Profile update failed:', action.error);
       })
+      // Смена пароля
       .addCase(changePassword.fulfilled, () => {
         console.log('Password changed successfully');
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.error = action.error.message || 'Ошибка смены пароля';
+        console.error('Password change failed:', action.error);
       });
   },
 });
