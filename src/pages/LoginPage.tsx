@@ -12,9 +12,7 @@ export const LoginPage = () => {
 
   // Функция для прямого мок-логина на GitHub Pages
   const handleDirectMockLogin = (username: string, password: string): boolean => {
-    // Проверяем, что мы на GitHub Pages
     if (window.location.hostname.includes('github.io')) {
-      // Тестовый пользователь
       if (username === 'testuser' && password === '123456') {
         const userData = {
           user_id: 1,
@@ -41,7 +39,6 @@ export const LoginPage = () => {
         navigate('/');
         return true;
       }
-      // Администратор
       if (username === 'admin' && password === 'admin123') {
         const userData = {
           user_id: 2,
@@ -69,9 +66,9 @@ export const LoginPage = () => {
         return true;
       }
       setError('Неверное имя пользователя или пароль');
-      return true; // Останавливаем дальнейшую обработку
+      return true;
     }
-    return false; // Не на GitHub Pages, продолжаем обычный логин
+    return false;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,37 +76,63 @@ export const LoginPage = () => {
     setLoading(true);
     setError('');
 
-    // Проверяем прямой мок-логин для GitHub Pages
     if (handleDirectMockLogin(username, password)) {
       setLoading(false);
       return;
     }
 
-    // Обычный логин для локальной разработки
     try {
       const response = await login(username, password);
       
-      console.log('Full response:', response);
-      console.log('Response data:', response.data);
+      console.log('Response:', response);
       
-      const result = response.data || response;
+      // Проверяем тип ответа (мок или реальный API)
+      // У мок-ответа есть свойство 'success'
+      const isMockResponse = response && typeof response === 'object' && 'success' in response;
       
-      if (result.success) {
-        const userData = result;
-        
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userId', userData.user_id);
-        localStorage.setItem('isAdmin', userData.is_admin);
-        localStorage.setItem('username', userData.username);
-        localStorage.setItem('user', JSON.stringify({
-          id: userData.user_id,
-          username: userData.username,
-          is_admin: userData.is_admin,
-        }));
-        
-        navigate('/');
+      if (isMockResponse) {
+        // Мок-ответ от api.ts
+        if (response.success && response.data) {
+          const userData = response.data;
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('userId', userData.id || userData.user_id);
+          localStorage.setItem('isAdmin', userData.is_admin);
+          localStorage.setItem('username', userData.username);
+          localStorage.setItem('user', JSON.stringify({
+            id: userData.id || userData.user_id,
+            username: userData.username,
+            is_admin: userData.is_admin,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            phone: userData.phone,
+            email: userData.email
+          }));
+          navigate('/');
+        } else {
+          setError(response.error || 'Ошибка входа');
+        }
       } else {
-        setError(result.error || 'Ошибка входа');
+        // AxiosResponse от реального API
+        const axiosResponse = response as any;
+        if (axiosResponse.data?.success) {
+          const userData = axiosResponse.data.data;
+          localStorage.setItem('isAuthenticated', 'true');
+          localStorage.setItem('userId', userData.id);
+          localStorage.setItem('isAdmin', userData.is_admin);
+          localStorage.setItem('username', userData.username);
+          localStorage.setItem('user', JSON.stringify({
+            id: userData.id,
+            username: userData.username,
+            is_admin: userData.is_admin,
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            phone: userData.phone,
+            email: userData.email
+          }));
+          navigate('/');
+        } else {
+          setError(axiosResponse.data?.error || 'Ошибка входа');
+        }
       }
     } catch (err: any) {
       console.error('Login error:', err);
@@ -133,7 +156,7 @@ export const LoginPage = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                placeholder="testuser или admin"
+                placeholder="admin или petrov"
               />
             </Form.Group>
             <Form.Group className="mb-3">
@@ -143,7 +166,7 @@ export const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="123456 или admin123"
+                placeholder="пароль"
               />
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100" disabled={loading}>
