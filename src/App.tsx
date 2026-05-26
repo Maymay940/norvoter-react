@@ -15,6 +15,9 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 
+// Убираем определение isTauri - оно больше не нужно
+// const isTauri = typeof window !== 'undefined' && (window.__TAURI__ !== undefined || import.meta.env.VITE_IS_TAURI === true);
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   if (!isAuthenticated) {
@@ -29,11 +32,9 @@ function App() {
   useEffect(() => {
     dispatch(restoreSession());
   }, [dispatch]);
-  
-  const basename = import.meta.env.VITE_IS_GITHUB_PAGES ? '/norvoter-react' : '/';
-  
+
   return (
-    <BrowserRouter basename={basename}>
+    <BrowserRouter>
       <Navbar />
       <div className="container">
         <Breadcrumbs />

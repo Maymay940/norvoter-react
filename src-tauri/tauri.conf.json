@@ -20,7 +20,7 @@
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self' 'unsafe-inline' 'unsafe-eval' http: https: ws: data:; connect-src 'self' http://localhost:8001 http://127.0.0.1:8001 https: data:"
     }
   },
   "bundle": {
