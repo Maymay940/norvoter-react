@@ -7,6 +7,7 @@ import { VideoBackground } from '../components/VideoBackground';
 import { getMeters } from '../services/api';
 import type { RootState } from '../store';
 import { setAddress, setMeterType, setSortBy } from '../store/slices/filtersSlice';
+import type { Meter } from '../types/meter';
 
 export const MetersPage = () => {
   const dispatch = useDispatch();
@@ -14,7 +15,7 @@ export const MetersPage = () => {
   const [localSearch, setLocalSearch] = useState(address);
   const queryClient = useQueryClient();
 
-  const { data: meters = [], isLoading, isFetching, error, status } = useQuery({
+  const { data: meters = [], isLoading, isFetching, error, status } = useQuery<Meter[]>({
     queryKey: ['meters', address],
     queryFn: () => getMeters(address),
     staleTime: 5 * 60 * 1000,
@@ -35,10 +36,9 @@ export const MetersPage = () => {
     }
   };
 
-  // Фильтрация и сортировка на фронте
-  const filteredMeters = (meters || [])
-    .filter(m => address === '' || m.address.toLowerCase().includes(address.toLowerCase()))
-    .filter(m => meterType === 'all' || m.meter_type === meterType)
+  const filteredMeters = meters
+    .filter((meter) => address === '' || meter.address.toLowerCase().includes(address.toLowerCase()))
+    .filter((meter) => meterType === 'all' || meter.meter_type === meterType)
     .sort((a, b) => {
       if (sortBy === 'address') {
         return a.address.localeCompare(b.address);
@@ -73,7 +73,6 @@ export const MetersPage = () => {
               <div className="d-flex justify-content-between align-items-center flex-wrap">
                 <h1 className="page-title page-title-light">Счетчики воды</h1>
                 <div className="d-flex gap-2">
-                  {/* Фильтр по типу */}
                   <Form.Select 
                     value={meterType} 
                     onChange={(e) => dispatch(setMeterType(e.target.value as any))}
@@ -85,7 +84,6 @@ export const MetersPage = () => {
                     <option value="COLD">ХВС</option>
                   </Form.Select>
                   
-                  {/* Сортировка */}
                   <Form.Select 
                     value={sortBy} 
                     onChange={(e) => dispatch(setSortBy(e.target.value as any))}
