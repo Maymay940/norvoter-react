@@ -15,7 +15,7 @@ interface RequestType {
 }
 
 let currentUser: any = null;
-let currentDraftRequest: any = null;
+//let currentDraftRequest: any = null;
 let nextRequestId = 5;
 let nextPositionId = 6;
 
@@ -34,7 +34,7 @@ export const mockLogin = async (username: string, password: string) => {
 export const mockLogout = async () => {
   await delay();
   currentUser = null;
-  currentDraftRequest = null;
+  //currentDraftRequest = null;
   return { success: true };
 };
 
