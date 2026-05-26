@@ -29,7 +29,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   </React.StrictMode>
 );
 
-if ('serviceWorker' in navigator) {
+// Регистрация Service Worker ТОЛЬКО в режиме разработки/локально, но не на GitHub Pages
+// VITE_IS_GITHUB_PAGES будет true при production сборке для GitHub Pages
+const isGitHubPages = import.meta.env.VITE_IS_GITHUB_PAGES === true;
+
+if ('serviceWorker' in navigator && !isGitHubPages) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js')
       .then(reg => console.log('Service Worker registered:', reg))

@@ -13,4 +13,7 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
+  define: {
+    'import.meta.env.VITE_IS_GITHUB_PAGES': JSON.stringify(mode === 'production'),
+  },
 }))

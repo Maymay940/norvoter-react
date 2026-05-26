@@ -29,9 +29,11 @@ function App() {
   useEffect(() => {
     dispatch(restoreSession());
   }, [dispatch]);
-
+  
+  const basename = import.meta.env.VITE_IS_GITHUB_PAGES ? '/norvoter-react' : '/';
+  
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={basename}>
       <Navbar />
       <div className="container">
         <Breadcrumbs />

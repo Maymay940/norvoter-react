@@ -1443,3 +1443,18 @@ td .btn-sm {
   background-color: #1a1a2e;
   color: white;
 }
+
+/* Для лабораторной работы - конкретные значения */
+@media (max-width: 576px) {
+  .card-col { width: 100%; }  /* 1 колонка */
+  .container { padding: 0 10px; }
+  .fs-mobile { font-size: 14px; }
+}
+
+@media (min-width: 577px) and (max-width: 992px) {
+  .card-col { width: calc(50% - 1rem); }  /* 2 колонки */
+}
+
+@media (min-width: 993px) {
+  .card-col { width: calc(33.333% - 1rem); }  /* 3 колонки */
+}
