@@ -15,9 +15,30 @@ export const MetersPage = () => {
   const [localSearch, setLocalSearch] = useState(address);
   const queryClient = useQueryClient();
 
+  // Исправленная queryFn - извлекаем массив из ответа
   const { data: meters = [], isLoading, isFetching, error, status } = useQuery<Meter[]>({
     queryKey: ['meters', address],
-    queryFn: () => getMeters(address),
+    queryFn: async () => {
+      const response = await getMeters(address);
+      
+      // Обрабатываем разные форматы ответа с правильной типизацией
+      if (response && typeof response === 'object') {
+        // Если response - это массив
+        if (Array.isArray(response)) {
+          return response;
+        }
+        // Если response имеет поле data с массивом
+        if ('data' in response && Array.isArray((response as any).data)) {
+          return (response as any).data;
+        }
+        // Если response.data имеет поле data с массивом
+        if ('data' in response && (response as any).data && 'data' in (response as any).data && Array.isArray((response as any).data.data)) {
+          return (response as any).data.data;
+        }
+      }
+      
+      return [];
+    },
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
   });
@@ -36,7 +57,7 @@ export const MetersPage = () => {
     }
   };
 
-  const filteredMeters = meters
+  const filteredMeters = (Array.isArray(meters) ? meters : [])
     .filter((meter) => address === '' || meter.address.toLowerCase().includes(address.toLowerCase()))
     .filter((meter) => meterType === 'all' || meter.meter_type === meterType)
     .sort((a, b) => {

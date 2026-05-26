@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';  
 import type { AppDispatch, RootState } from '../store';
-import { fetchRequests, completeRequest, rejectRequest, setFilters } from '../store/slices/requestsSlice';
+import { fetchRequests, setFilters } from '../store/slices/requestsSlice';
 import { Table, Badge, Button, Form, Row, Col, Spinner } from 'react-bootstrap';
 
 export const RequestsPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();  
   const { items: requests, loading, filters } = useSelector((state: RootState) => state.requests);
-  const { user } = useSelector((state: RootState) => state.auth);
   const [dateFrom, setDateFrom] = useState(filters.date_from);
   const [dateTo, setDateTo] = useState(filters.date_to);
   const [statusFilter, setStatusFilter] = useState(filters.status);
@@ -28,18 +27,6 @@ export const RequestsPage = () => {
 
   const handleFilter = () => {
     dispatch(setFilters({ status: statusFilter, date_from: dateFrom, date_to: dateTo }));
-    loadRequests();
-  };
-
-  const handleComplete = async (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();  // предотвращает переход на детали
-    await dispatch(completeRequest(id));
-    loadRequests();
-  };
-
-  const handleReject = async (id: number, e: React.MouseEvent) => {
-    e.stopPropagation();  // предотвращает переход на детали
-    await dispatch(rejectRequest(id));
     loadRequests();
   };
 
@@ -108,7 +95,6 @@ export const RequestsPage = () => {
             <th>Дата отправки</th>
             <th>Кол-во</th>
             <th>Сумма</th>
-            {user?.is_admin && <th>Действия</th>}
           </tr>
         </thead>
         <tbody>
@@ -125,25 +111,6 @@ export const RequestsPage = () => {
               <td>{req.submitted_at || '-'}</td>
               <td>{req.positions_count}</td>
               <td>{req.amount_to_pay ? `${req.amount_to_pay} ₽` : '-'}</td>
-              {user?.is_admin && req.status === 'submitted' && (
-                <td onClick={(e) => e.stopPropagation()}>
-                  <Button 
-                    size="sm" 
-                    variant="success" 
-                    onClick={(e) => handleComplete(req.id, e)}
-                    className="me-1"
-                  >
-                    Завершить
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="danger" 
-                    onClick={(e) => handleReject(req.id, e)}
-                  >
-                    Отклонить
-                  </Button>
-                </td>
-              )}
             </tr>
           ))}
         </tbody>
