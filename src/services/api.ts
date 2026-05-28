@@ -2,8 +2,15 @@ import axios from 'axios';
 import * as mockApi from './mockApi';
 import type { Meter } from '../types/meter';
 
+// Явное определение GitHub Pages
+const hostname = window.location.hostname;
+const isGitHubPages = hostname === 'maymay940.github.io' || hostname.includes('github.io');
+const USE_MOCK = isGitHubPages;
 
-const USE_MOCK = true;  // ← меняй здесь true/false
+console.log('=== API НАСТРОЙКИ ===');
+console.log('Hostname:', hostname);
+console.log('isGitHubPages:', isGitHubPages);
+console.log('USE_MOCK:', USE_MOCK);
 
 
 const api = axios.create({
