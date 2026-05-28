@@ -11,43 +11,18 @@ export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
 
   // Функция для прямого мок-логина на GitHub Pages
-  const handleDirectMockLogin = (username: string, password: string): boolean => {
+    const handleDirectMockLogin = (username: string, password: string): boolean => {
     if (window.location.hostname.includes('github.io')) {
-      if (username === 'testuser' && password === '123456') {
-        const userData = {
-          user_id: 1,
-          username: 'testuser',
-          is_admin: false,
-          first_name: 'Тест',
-          last_name: 'Пользователь',
-          phone: '+7 (999) 123-45-67',
-          email: 'test@example.com'
-        };
-        localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userId', String(userData.user_id));
-        localStorage.setItem('isAdmin', String(userData.is_admin));
-        localStorage.setItem('username', userData.username);
-        localStorage.setItem('user', JSON.stringify({
-          id: userData.user_id,
-          username: userData.username,
-          is_admin: userData.is_admin,
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          phone: userData.phone,
-          email: userData.email
-        }));
-        navigate('/');
-        return true;
-      }
-      if (username === 'admin' && password === 'admin123') {
+    // Пользователь ivanov
+      if (username === 'ivanov' && password === 'user123') {
         const userData = {
           user_id: 2,
-          username: 'admin',
-          is_admin: true,
-          first_name: 'Админ',
-          last_name: 'Системы',
-          phone: '+7 (888) 123-45-67',
-          email: 'admin@example.com'
+          username: 'ivanov',
+          is_admin: false,
+          first_name: 'Иван',
+          last_name: 'Иванов',
+          phone: '+7 (999) 123-45-67',
+          email: 'ivanov@email.com'
         };
         localStorage.setItem('isAuthenticated', 'true');
         localStorage.setItem('userId', String(userData.user_id));
@@ -62,7 +37,34 @@ export const LoginPage = () => {
           phone: userData.phone,
           email: userData.email
         }));
-        navigate('/');
+        window.location.href = '/norvoter-react/';
+        return true;
+      }
+    // Админ
+      if (username === 'admin' && password === 'admin123') {
+        const userData = {
+          user_id: 1,
+          username: 'admin',
+          is_admin: true,
+          first_name: 'Администратор',
+          last_name: 'Системы',
+          phone: '+7 (999) 000-00-00',
+          email: 'admin@norvoter.com'
+        };
+        localStorage.setItem('isAuthenticated', 'true');
+        localStorage.setItem('userId', String(userData.user_id));
+        localStorage.setItem('isAdmin', String(userData.is_admin));
+        localStorage.setItem('username', userData.username);
+        localStorage.setItem('user', JSON.stringify({
+          id: userData.user_id,
+          username: userData.username,
+          is_admin: userData.is_admin,
+          first_name: userData.first_name,
+          last_name: userData.last_name,
+          phone: userData.phone,
+          email: userData.email
+        }));
+        window.location.href = '/norvoter-react/';
         return true;
       }
       setError('Неверное имя пользователя или пароль');
