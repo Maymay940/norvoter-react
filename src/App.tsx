@@ -15,17 +15,16 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 
-// Убираем определение isTauri - оно больше не нужно
-// const isTauri = typeof window !== 'undefined' && (window.__TAURI__ !== undefined || import.meta.env.VITE_IS_TAURI === true);
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  if (!isAuthenticated) {
+  const user = localStorage.getItem('user');
+  
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
   return <>{children}</>;
 };
-
 function App() {
   const dispatch = useDispatch<AppDispatch>();
 

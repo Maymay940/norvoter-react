@@ -9,12 +9,16 @@ export const Navbar = () => {
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
   const handleLogout = async () => {
-    await logout();
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userId');
-    localStorage.removeItem('isAdmin');
-    localStorage.removeItem('username');
-    navigate('/login');
+  await logout();
+  // Очищаем всё localStorage
+  localStorage.clear();
+  // Или если хотите оставить что-то конкретное:
+  // localStorage.removeItem('isAuthenticated');
+  // localStorage.removeItem('userId');
+  // localStorage.removeItem('isAdmin');
+  // localStorage.removeItem('username');
+  // localStorage.removeItem('user');
+  navigate('/login');
   };
 
   return (

@@ -11,12 +11,15 @@ export const LoginPage = () => {
   const [loading, setLoading] = useState(false);
 
   // Функция для прямого мок-логина на GitHub Pages
-    const handleDirectMockLogin = (username: string, password: string): boolean => {
+  const handleDirectMockLogin = (username: string, password: string): boolean => {
     if (window.location.hostname.includes('github.io')) {
-    // Пользователь ivanov
+      // Очищаем старую сессию перед новым входом
+      localStorage.clear();
+      
+      // Пользователь ivanov
       if (username === 'ivanov' && password === 'user123') {
         const userData = {
-          user_id: 2,
+          id: 2,
           username: 'ivanov',
           is_admin: false,
           first_name: 'Иван',
@@ -25,25 +28,17 @@ export const LoginPage = () => {
           email: 'ivanov@email.com'
         };
         localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userId', String(userData.user_id));
+        localStorage.setItem('userId', String(userData.id));
         localStorage.setItem('isAdmin', String(userData.is_admin));
         localStorage.setItem('username', userData.username);
-        localStorage.setItem('user', JSON.stringify({
-          id: userData.user_id,
-          username: userData.username,
-          is_admin: userData.is_admin,
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          phone: userData.phone,
-          email: userData.email
-        }));
-        window.location.href = '/norvoter-react/';
+        localStorage.setItem('user', JSON.stringify(userData));
+        navigate('/');
         return true;
       }
-    // Админ
+      // Админ
       if (username === 'admin' && password === 'admin123') {
         const userData = {
-          user_id: 1,
+          id: 1,
           username: 'admin',
           is_admin: true,
           first_name: 'Администратор',
@@ -52,19 +47,11 @@ export const LoginPage = () => {
           email: 'admin@norvoter.com'
         };
         localStorage.setItem('isAuthenticated', 'true');
-        localStorage.setItem('userId', String(userData.user_id));
+        localStorage.setItem('userId', String(userData.id));
         localStorage.setItem('isAdmin', String(userData.is_admin));
         localStorage.setItem('username', userData.username);
-        localStorage.setItem('user', JSON.stringify({
-          id: userData.user_id,
-          username: userData.username,
-          is_admin: userData.is_admin,
-          first_name: userData.first_name,
-          last_name: userData.last_name,
-          phone: userData.phone,
-          email: userData.email
-        }));
-        window.location.href = '/norvoter-react/';
+        localStorage.setItem('user', JSON.stringify(userData));
+        navigate('/');
         return true;
       }
       setError('Неверное имя пользователя или пароль');
@@ -78,18 +65,19 @@ export const LoginPage = () => {
     setLoading(true);
     setError('');
 
+    // Сначала пробуем прямой мок-логин (для GitHub Pages)
     if (handleDirectMockLogin(username, password)) {
       setLoading(false);
       return;
     }
 
+    // Для локальной разработки
     try {
       const response = await login(username, password);
       
       console.log('Response:', response);
       
       // Проверяем тип ответа (мок или реальный API)
-      // У мок-ответа есть свойство 'success'
       const isMockResponse = response && typeof response === 'object' && 'success' in response;
       
       if (isMockResponse) {
@@ -158,7 +146,7 @@ export const LoginPage = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                placeholder="admin или petrov"
+                placeholder="ivanov или admin"
               />
             </Form.Group>
             <Form.Group className="mb-3">
@@ -168,7 +156,7 @@ export const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="пароль"
+                placeholder="user123 или admin123"
               />
             </Form.Group>
             <Button type="submit" variant="primary" className="w-100" disabled={loading}>
