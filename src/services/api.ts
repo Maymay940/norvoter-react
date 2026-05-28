@@ -3,7 +3,7 @@ import * as mockApi from './mockApi';
 import type { Meter } from '../types/meter';
 
 
-const USE_MOCK = false;  // ← меняй здесь true/false
+const USE_MOCK = true;  // ← меняй здесь true/false
 
 
 const api = axios.create({
