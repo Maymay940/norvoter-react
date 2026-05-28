@@ -1,12 +1,12 @@
-FROM node:18-alpine AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# Копируем только package.json (не всю папку!)
+# Копируем package.json
 COPY package*.json ./
 
-# Устанавливаем зависимости (кешируется Docker)
-RUN npm ci --only=production || npm install
+# Устанавливаем все зависимости
+RUN npm install
 
 # Копируем исходники
 COPY . .

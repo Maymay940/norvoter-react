@@ -1,4 +1,4 @@
-import { mockUsers} from './mockData';
+import { mockUsers, mockMeters} from './mockData';
 
 // Определим тип для заявки
 interface RequestType {
@@ -228,16 +228,24 @@ export const mockLogout = async () => {
   return { success: true };
 };
 
-// Счетчики - возвращаем только для текущего пользователя или все для админа
+const metersOwnership: Record<number, number> = {
+  1: 2, 
+  2: 2,  
+};
+
 export const mockGetMeters = async () => {
   await delay();
+  console.log('currentUser:', currentUser);
+  
   if (!currentUser) return { success: true, data: [] };
   
-  let meters = mockMetersData;
-  if (!currentUser.is_admin) {
-    meters = mockMetersData.filter(m => m.user_id === currentUser.id);
+  if (currentUser.is_admin) {
+    return { success: true, data: mockMeters };
   }
-  return { success: true, data: meters };
+
+  const userMeters = mockMeters.filter(meter => metersOwnership[meter.id] === currentUser.id);
+  console.log(`Пользователь ${currentUser.username} видит ${userMeters.length} счетчиков`);
+  return { success: true, data: userMeters };
 };
 
 export const mockGetMeterById = async (id: number) => {
