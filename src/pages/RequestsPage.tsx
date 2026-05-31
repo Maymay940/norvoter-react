@@ -59,14 +59,14 @@ export const RequestsPage = () => {
       </div>
 
       {/* Фильтры */}
-      <div className="filters-panel" style={{ 
+      <div className="filters-panel" style={{
         backgroundColor: 'rgba(255, 255, 255, 0.95)', 
         borderRadius: '20px', 
         padding: '20px',
         marginBottom: '30px'
       }}>
-        <Row className="align-items-end">
-          <Col md={3}>
+        <Row className="g-3 align-items-end">
+          <Col xs={12} sm={6} lg={3}>
             <Form.Group>
               <Form.Label style={{ fontSize: '14px', color: '#666', marginBottom: '6px' }}>Дата от</Form.Label>
               <Form.Control
@@ -77,7 +77,7 @@ export const RequestsPage = () => {
               />
             </Form.Group>
           </Col>
-          <Col md={3}>
+          <Col xs={12} sm={6} lg={3}>
             <Form.Group>
               <Form.Label style={{ fontSize: '14px', color: '#666', marginBottom: '6px' }}>Дата до</Form.Label>
               <Form.Control
@@ -88,7 +88,7 @@ export const RequestsPage = () => {
               />
             </Form.Group>
           </Col>
-          <Col md={3}>
+          <Col xs={12} sm={6} lg={3}>
             <Form.Group>
               <Form.Label style={{ fontSize: '14px', color: '#666', marginBottom: '6px' }}>Статус</Form.Label>
               <Form.Select 
@@ -104,7 +104,7 @@ export const RequestsPage = () => {
               </Form.Select>
             </Form.Group>
           </Col>
-          <Col md={3}>
+          <Col xs={12} sm={6} lg={3}>
             <button 
               className="btn-primary" 
               onClick={handleFilter}
@@ -136,7 +136,7 @@ export const RequestsPage = () => {
       </div>
 
       <div className="requests-list">
-        <Table striped bordered hover style={{ backgroundColor: 'white', borderRadius: '16px', overflow: 'hidden' }}>
+        <Table striped bordered hover responsive className="requests-table" style={{ backgroundColor: 'white', borderRadius: '16px', overflow: 'hidden' }}>
           <thead>
             <tr style={{ backgroundColor: '#f5f5f5' }}>
               <th style={{ padding: '12px 16px' }}>№</th>

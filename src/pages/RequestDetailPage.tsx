@@ -72,7 +72,7 @@ export const RequestDetailPage = () => {
       </Card>
 
       <h3>Показания счетчиков</h3>
-      <Table striped bordered>
+      <Table striped bordered responsive className="request-detail-table">
         <thead>
           <tr>
             <th>Адрес</th>
@@ -116,8 +116,8 @@ export const RequestDetailPage = () => {
       </Table>
 
       {isDraft && (
-        <div className="mt-4">
-          <Button variant="success" onClick={handleSubmit} className="me-2">
+        <div className="request-detail-actions mt-4">
+          <Button variant="success" onClick={handleSubmit}>
             Подать показания
           </Button>
           <Button variant="primary" href="/">

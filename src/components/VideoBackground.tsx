@@ -1,15 +1,15 @@
 // src/components/VideoBackground.tsx
 import { useState } from 'react';
+import { getAssetPath } from '../utils/paths';
 
 export const VideoBackground = () => {
   const [videoError, setVideoError] = useState(false);
   const isGitHubPages = window.location.hostname.includes('github.io');
-  
-  const videoSrc = isGitHubPages 
-    ? '/norvoter-react/videos/background.mp4'  // правильный путь для GitHub Pages
-    : 'http://localhost:9002/meters/video/video_water.mp4';  // локально - MinIO
 
-  // Если видео не загрузилось, показываем просто фон
+  const videoSrc = isGitHubPages 
+    ? getAssetPath('videos/background.mp4')
+    : 'http://localhost:9002/meters/video/video_water.mp4';
+
   if (videoError) {
     return (
       <div style={{
@@ -19,7 +19,8 @@ export const VideoBackground = () => {
         width: '100%',
         height: '100%',
         backgroundColor: '#0d6efd',
-        zIndex: -1
+        zIndex: 0,
+        pointerEvents: 'none'
       }} />
     );
   }

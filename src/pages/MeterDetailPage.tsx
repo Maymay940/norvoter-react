@@ -7,6 +7,18 @@ import { fetchMeters } from '../store/slices/metersSlice';
 import { addToRequest, fetchCart } from '../store/slices/requestSlice';
 import type { Meter } from '../store/slices/metersSlice';
 import { Button, Spinner, Alert } from 'react-bootstrap';
+import { getAssetPath } from '../utils/paths';
+
+const getMeterImageSrc = (meter: Meter) => {
+  if (meter.photo_url) {
+    if (/^https?:\/\//i.test(meter.photo_url)) {
+      return meter.photo_url;
+    }
+    return getAssetPath(meter.photo_url);
+  }
+
+  return getAssetPath(meter.meter_type === 'HOT' ? 'images/meter-hot.png' : 'images/meter-cold.png');
+};
 
 export const MeterDetailPage = () => {
   const { id } = useParams();
@@ -96,11 +108,7 @@ export const MeterDetailPage = () => {
 
           <div className="meter-card">
             <div className="card__image-col">
-              {meter.photo_url ? (
-                <img src={meter.photo_url} alt={`Счетчик ${meter.serial_number}`} className="meter-photo" />
-              ) : (
-                <img src="/default-meter.jpg" alt="Нет фото" className="meter-photo" />
-              )}
+              <img src={getMeterImageSrc(meter)} alt={`Счетчик ${meter.serial_number}`} className="meter-photo" />
               
               {meter.setup_video_url && (
                 <div className="video-section">

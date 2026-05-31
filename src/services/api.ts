@@ -18,7 +18,7 @@ console.log('Hostname:', hostname);
 console.log('isGitHubPages:', isGitHubPages);
 
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: API_BASE_URL,
   withCredentials: true,
 });
 

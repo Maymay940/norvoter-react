@@ -73,7 +73,7 @@ export const mockMeters: Meter[] = [
     meter_model: 'СГВ-15', 
     installation_date: '2023-01-15', 
     last_verified_reading: 1250, 
-    photo_url: '/norvoter-react/images/meter-hot.png',  
+    photo_url: 'images/meter-hot.png',
     setup_video_url: null
   },
   { 
@@ -85,7 +85,7 @@ export const mockMeters: Meter[] = [
     meter_model: 'СХВ-13', 
     installation_date: '2023-01-15', 
     last_verified_reading: 2030, 
-    photo_url: '/norvoter-react/images/meter-cold.png',
+    photo_url: 'images/meter-cold.png',
     setup_video_url: null 
   },
 ];
@@ -194,7 +194,20 @@ export const setMockCurrentUser = (user: User | null) => {
   currentUser = user;
 };
 
-export const getMockCurrentUser = () => currentUser;
+export const getMockCurrentUser = () => {
+  if (!currentUser) {
+    const savedUser = localStorage.getItem('user');
+    if (savedUser) {
+      try {
+        currentUser = JSON.parse(savedUser) as User;
+      } catch {
+        localStorage.removeItem('user');
+      }
+    }
+  }
+
+  return currentUser;
+};
 
 export const getNextRequestId = () => nextRequestId++;
 export const getNextPositionId = () => nextPositionId++;

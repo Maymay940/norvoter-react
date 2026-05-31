@@ -66,9 +66,24 @@ const loadUsers = async () => {
       if (filterStatus) params.status = filterStatus;
       if (filterDateFrom) params.date_from = filterDateFrom;
       if (filterDateTo) params.date_to = filterDateTo;
-      
-      const response = await axios.get('/api/requests/', { params });
-      setRequests(response.data.data.requests);
+
+      if (USE_MOCK) {
+        const response = await mockApi.mockGetAllRequests();
+        let requestsData = (response.data?.requests || []) as RequestItem[];
+        if (filterStatus) {
+          requestsData = requestsData.filter((req) => req.status === filterStatus);
+        }
+        if (filterDateFrom) {
+          requestsData = requestsData.filter((req) => req.created_at >= filterDateFrom);
+        }
+        if (filterDateTo) {
+          requestsData = requestsData.filter((req) => req.created_at <= filterDateTo);
+        }
+        setRequests(requestsData);
+      } else {
+        const response = await axios.get('/api/requests/', { params });
+        setRequests(response.data.data.requests);
+      }
     } catch (error) {
       console.error('Ошибка загрузки заявок:', error);
     } finally {
@@ -86,17 +101,29 @@ const loadUsers = async () => {
   };
 
   const handleComplete = async (id: number) => {
-    await axios.put(`/api/requests/${id}/complete/`);
+    if (USE_MOCK) {
+      await mockApi.mockCompleteRequest(id);
+    } else {
+      await axios.put(`/api/requests/${id}/complete/`);
+    }
     loadRequests();
   };
 
   const handleReject = async (id: number) => {
-    await axios.put(`/api/requests/${id}/reject/`);
+    if (USE_MOCK) {
+      await mockApi.mockRejectRequest(id);
+    } else {
+      await axios.put(`/api/requests/${id}/reject/`);
+    }
     loadRequests();
   };
 
   const handleDelete = async (id: number) => {
-    await axios.delete(`/api/requests/${id}/delete/`);
+    if (USE_MOCK) {
+      await mockApi.mockDeleteRequest(id);
+    } else {
+      await axios.delete(`/api/requests/${id}/delete/`);
+    }
     loadRequests();
     setShowDeleteModal(false);
   };
@@ -129,8 +156,8 @@ const loadUsers = async () => {
       <p className="text-muted mb-4">Управление заявками всех пользователей</p>
 
       {/* Фильтры */}
-      <Row className="mb-4">
-        <Col md={3}>
+      <Row className="filters-panel g-3 align-items-end">
+        <Col xs={12} sm={6} lg={3}>
           <Form.Select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="">Все статусы</option>
             <option value="draft">Черновик</option>
@@ -139,7 +166,7 @@ const loadUsers = async () => {
             <option value="rejected">Отклонено</option>
           </Form.Select>
         </Col>
-        <Col md={3}>
+        <Col xs={12} sm={6} lg={3}>
           <Form.Control
             type="date"
             value={filterDateFrom}
@@ -147,7 +174,7 @@ const loadUsers = async () => {
             placeholder="Дата от"
           />
         </Col>
-        <Col md={3}>
+        <Col xs={12} sm={6} lg={3}>
           <Form.Control
             type="date"
             value={filterDateTo}
@@ -155,7 +182,7 @@ const loadUsers = async () => {
             placeholder="Дата до"
           />
         </Col>
-        <Col md={3}>
+        <Col xs={12} sm={6} lg={3}>
           <Button variant="primary" onClick={loadRequests} size="sm" className="rounded-pill w-100">Применить</Button>
         </Col>
       </Row>
@@ -184,7 +211,7 @@ const loadUsers = async () => {
               <td>{req.submitted_at || '-'}</td>
               <td>{req.positions_count}</td>
               <td>{req.amount_to_pay ? `${req.amount_to_pay} ₽` : '-'}</td>
-              <td style={{ whiteSpace: 'nowrap' }}>
+              <td className="admin-actions">
 
                 <Button
                   size="sm"

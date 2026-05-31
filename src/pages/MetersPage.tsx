@@ -45,7 +45,7 @@ export const MetersPage = () => {
     queryClient.invalidateQueries({ queryKey: ['meters'] });
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSearch();
     }
@@ -85,14 +85,13 @@ export const MetersPage = () => {
         <main className="main">
           <div className="container">
             <div className="page-header">
-              <div className="d-flex justify-content-between align-items-center flex-wrap">
+              <div className="page-header-bar">
                 <h1 className="page-title page-title-light">Счетчики воды</h1>
                 <div className="filters-wrapper">
-
                   <select 
                     value={meterType} 
                     onChange={(e) => dispatch(setMeterType(e.target.value as any))}
-                    className="filter-select"
+                    className="filter-select meter-type-filter"
                   >
                     <option value="all">Все типы</option>
                     <option value="HOT">ГВС</option>
@@ -102,13 +101,12 @@ export const MetersPage = () => {
                   <select 
                     value={sortBy} 
                     onChange={(e) => dispatch(setSortBy(e.target.value as any))}
-                    className="filter-select"
+                    className="filter-select meter-sort-filter"
                   >
                     <option value="address">По адресу</option>
                     <option value="last_reading">По показаниям</option>
                   </select>
                   
-                  {/* Индикатор обновления */}
                   {isRefreshing && <Spinner animation="border" size="sm" className="ms-2" />}
                 </div>
               </div>
@@ -122,7 +120,7 @@ export const MetersPage = () => {
                   placeholder="Найти по адресу..."
                   value={localSearch}
                   onChange={(e) => setLocalSearch(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                 />
                 <button className="search-button search-button-light" onClick={handleSearch}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
