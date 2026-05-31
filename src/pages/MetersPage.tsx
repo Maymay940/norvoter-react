@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { Spinner, Badge, Form } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
 import { MeterCard } from '../components/MeterCard';
 import { VideoBackground } from '../components/VideoBackground';
 import { getMeters } from '../services/api';
@@ -15,23 +15,18 @@ export const MetersPage = () => {
   const [localSearch, setLocalSearch] = useState(address);
   const queryClient = useQueryClient();
 
-  // Исправленная queryFn - извлекаем массив из ответа
-  const { data: meters = [], isLoading, isFetching, error, status } = useQuery<Meter[]>({
+  const { data: meters = [], isLoading, isFetching, error } = useQuery<Meter[]>({
     queryKey: ['meters', address],
     queryFn: async () => {
       const response = await getMeters(address);
       
-      // Обрабатываем разные форматы ответа с правильной типизацией
       if (response && typeof response === 'object') {
-        // Если response - это массив
         if (Array.isArray(response)) {
           return response;
         }
-        // Если response имеет поле data с массивом
         if ('data' in response && Array.isArray((response as any).data)) {
           return (response as any).data;
         }
-        // Если response.data имеет поле data с массивом
         if ('data' in response && (response as any).data && 'data' in (response as any).data && Array.isArray((response as any).data.data)) {
           return (response as any).data.data;
         }
@@ -43,7 +38,6 @@ export const MetersPage = () => {
     gcTime: 10 * 60 * 1000,
   });
 
-  const isFromCache = status === 'success' && !isFetching;
   const isRefreshing = isFetching && !isLoading;
 
   const handleSearch = () => {
@@ -93,34 +87,29 @@ export const MetersPage = () => {
             <div className="page-header">
               <div className="d-flex justify-content-between align-items-center flex-wrap">
                 <h1 className="page-title page-title-light">Счетчики воды</h1>
-                <div className="d-flex gap-2">
-                  <Form.Select 
+                <div className="filters-wrapper">
+
+                  <select 
                     value={meterType} 
                     onChange={(e) => dispatch(setMeterType(e.target.value as any))}
-                    style={{ width: '120px' }}
-                    className="bg-dark text-white"
+                    className="filter-select"
                   >
                     <option value="all">Все типы</option>
                     <option value="HOT">ГВС</option>
                     <option value="COLD">ХВС</option>
-                  </Form.Select>
+                  </select>
                   
-                  <Form.Select 
+                  <select 
                     value={sortBy} 
                     onChange={(e) => dispatch(setSortBy(e.target.value as any))}
-                    style={{ width: '160px' }}
-                    className="bg-dark text-white"
+                    className="filter-select"
                   >
                     <option value="address">По адресу</option>
                     <option value="last_reading">По показаниям</option>
-                  </Form.Select>
+                  </select>
                   
-                  {isRefreshing && <Spinner animation="border" size="sm" className="me-2" />}
-                  {isFromCache && !isRefreshing && (
-                    <Badge bg="success" pill className="ms-2">
-                      Кэш
-                    </Badge>
-                  )}
+                  {/* Индикатор обновления */}
+                  {isRefreshing && <Spinner animation="border" size="sm" className="ms-2" />}
                 </div>
               </div>
             </div>

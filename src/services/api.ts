@@ -2,30 +2,39 @@ import axios from 'axios';
 import * as mockApi from './mockApi';
 import type { Meter } from '../types/meter';
 
-// Явное определение GitHub Pages
 const hostname = window.location.hostname;
 const isGitHubPages = hostname === 'maymay940.github.io' || hostname.includes('github.io');
-const USE_MOCK = isGitHubPages;
+const USE_MOCK = isGitHubPages; 
+const isTauri = !!(window as any).__TAURI_INTERNALS__;
 
-console.log('=== API НАСТРОЙКИ ===');
+let API_BASE_URL = '/api';
+
+if (isTauri) {
+  API_BASE_URL = 'http://localhost:8001/api';
+}
+
+console.log('настройки');
 console.log('Hostname:', hostname);
 console.log('isGitHubPages:', isGitHubPages);
-console.log('USE_MOCK:', USE_MOCK);
-
 
 const api = axios.create({
   baseURL: '/api',
   withCredentials: true,
 });
 
+// логин
 export const login = async (username: string, password: string) => {
-  if (USE_MOCK) return mockApi.mockLogin(username, password);
+  if (USE_MOCK) {
+    return mockApi.mockLogin(username, password);
+  }
   const response = await api.post('/users/login/', { username, password });
   return response;
 };
 
 export const logout = async () => {
-  if (USE_MOCK) return mockApi.mockLogout();
+  if (USE_MOCK) {
+    return mockApi.mockLogout();
+  }
   const response = await api.post('/users/logout/');
   return response;
 };
@@ -136,9 +145,34 @@ export const register = async (userData: {
   phone?: string;
 }) => {
   if (USE_MOCK) {
-    const response = await mockApi.mockRegister(userData);
-    return response;
+    return await mockApi.mockRegister(userData);
   }
   const response = await api.post('/users/register/', userData);
   return response.data;
+};
+
+export const getAllRequests = async () => {
+  if (USE_MOCK) {
+    const response = await mockApi.mockGetAllRequests();
+    return response;
+  }
+  const response = await api.get('/admin/requests/');
+  return response;
+};
+
+export const getAllUsers = async () => {
+  if (USE_MOCK) {
+    const response = await mockApi.mockGetAllUsers();
+    return response;
+  }
+  const response = await api.get('/admin/users/');
+  return response;
+};
+
+export const updatePosition = async (positionId: number, currentReading: number) => {
+  if (USE_MOCK) {
+    return mockApi.mockUpdatePosition(positionId, currentReading);
+  }
+  const response = await api.put(`/positions/${positionId}/update/`, { current_reading: currentReading });
+  return response;
 };

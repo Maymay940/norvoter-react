@@ -1,7 +1,8 @@
-// store/slices/requestsSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import * as mockApi from '../../services/mockApi';
+import { USE_MOCK } from '../../config/env';
 
 export interface RequestItem {
   id: number;
@@ -39,10 +40,18 @@ const initialState: RequestsState = {
   },
 };
 
-// Асинхронный thunk для получения списка заявок
+// для получения списка заявок
 export const fetchRequests = createAsyncThunk(
   'requests/fetchRequests',
   async (filters?: Partial<Filters>) => {
+    console.log('fetchRequests - USE_MOCK =', USE_MOCK);
+    
+    if (USE_MOCK) {
+      console.log('Используем мок-заявки');
+      const response = await mockApi.mockGetRequests(filters?.status);
+      return response.data.requests || [];
+    }
+    
     const params = new URLSearchParams();
     if (filters?.status) params.append('status', filters.status);
     if (filters?.date_from) params.append('date_from', filters.date_from);
@@ -53,19 +62,33 @@ export const fetchRequests = createAsyncThunk(
   }
 );
 
-// Асинхронный thunk для завершения заявки (модератор)
+// для завершения заявки 
 export const completeRequest = createAsyncThunk(
   'requests/completeRequest',
   async (requestId: number) => {
+    console.log('completeRequest - USE_MOCK =', USE_MOCK);
+    
+    if (USE_MOCK) {
+      await mockApi.mockCompleteRequest(requestId);
+      return requestId;
+    }
+    
     await axios.put(`/api/requests/${requestId}/complete/`);
     return requestId;
   }
 );
 
-// Асинхронный thunk для отклонения заявки (модератор)
+// для отклонения заявки 
 export const rejectRequest = createAsyncThunk(
   'requests/rejectRequest',
   async (requestId: number) => {
+    console.log('rejectRequest - USE_MOCK =', USE_MOCK);
+    
+    if (USE_MOCK) {
+      await mockApi.mockRejectRequest(requestId);
+      return requestId;
+    }
+    
     await axios.put(`/api/requests/${requestId}/reject/`);
     return requestId;
   }
@@ -91,19 +114,22 @@ const requestsSlice = createSlice({
       .addCase(fetchRequests.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
+        console.log('Заявки загружены:', state.items.length);
       })
       .addCase(fetchRequests.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Ошибка загрузки заявок';
+        console.error('Ошибка загрузки заявок:', action.error);
       })
       .addCase(completeRequest.fulfilled, (state, action) => {
-        // Обновляем статус заявки в списке
         const request = state.items.find(r => r.id === action.payload);
         if (request) request.status = 'completed';
+        console.log('Заявка завершена:', action.payload);
       })
       .addCase(rejectRequest.fulfilled, (state, action) => {
         const request = state.items.find(r => r.id === action.payload);
         if (request) request.status = 'rejected';
+        console.log('Заявка отклонена:', action.payload);
       });
   },
 });

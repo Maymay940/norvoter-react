@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { Table, Badge, Button, Spinner, Form, Row, Col, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { USE_MOCK } from '../config/env';
+import * as mockApi from '../services/mockApi';
 
 interface RequestItem {
   id: number;
@@ -29,21 +31,33 @@ export const AdminPage = () => {
   const [selectedRequest, setSelectedRequest] = useState<RequestItem | null>(null);
   const [users, setUsers] = useState<Record<number, string>>({});
 
-  // Загрузка пользователей для отображения имён
-  const loadUsers = async () => {
-    try {
-      // Получаем список пользователей из API (если есть эндпоинт)
+const loadUsers = async () => {
+  try {
+    let usersData;
+    
+    if (USE_MOCK) {
+      const response = await mockApi.mockGetAllUsers();
+      usersData = response.data;
+      console.log('Загружены мок-пользователи:', usersData);
+    } else {
       const response = await axios.get('/api/users/');
-      const userMap: Record<number, string> = {};
-      response.data.data.forEach((user: any) => {
-        userMap[user.id] = user.username;
-      });
-      setUsers(userMap);
-    } catch (error) {
-      // Если нет эндпоинта, показываем ID
-      console.error('Не удалось загрузить пользователей');
+      usersData = response.data.data;
     }
-  };
+    
+    const userMap: Record<number, string> = {};
+    usersData.forEach((user: any) => {
+      userMap[user.id] = user.username;
+    });
+    setUsers(userMap);
+  } catch (error) {
+    console.error('Не удалось загрузить пользователей:', error);
+    const fallbackMap: Record<number, string> = {
+      1: 'admin',
+      2: 'ivanov',
+    };
+    setUsers(fallbackMap);
+  }
+};
 
   const loadRequests = async () => {
     setLoading(true);

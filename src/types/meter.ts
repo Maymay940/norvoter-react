@@ -1,5 +1,6 @@
 export interface Meter {
   id: number;
+  user_id?: number; 
   address: string;
   serial_number: string;
   meter_type: 'HOT' | 'COLD';

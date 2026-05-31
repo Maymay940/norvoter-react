@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom'; 
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from './store';
 import { restoreSession } from './store/slices/authSlice';
@@ -15,7 +15,6 @@ import { NotFoundPage } from './pages/NotFoundPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { AdminPage } from './pages/AdminPage';
 
-
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   const user = localStorage.getItem('user');
@@ -25,6 +24,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
   return <>{children}</>;
 };
+
 function App() {
   const dispatch = useDispatch<AppDispatch>();
 
@@ -33,7 +33,7 @@ function App() {
   }, [dispatch]);
 
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
       <div className="container">
         <Breadcrumbs />
@@ -49,7 +49,7 @@ function App() {
         <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-    </BrowserRouter>
+    </>
   );
 }
 

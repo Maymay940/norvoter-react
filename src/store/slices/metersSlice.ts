@@ -1,6 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
+import * as mockApi from '../../services/mockApi';  
+import { USE_MOCK } from '../../config/env'; 
 
 export interface Meter {
   id: number;
@@ -30,10 +32,14 @@ const initialState: MetersState = {
   searchAddress: '',
 };
 
-// Асинхронный thunk для получения списка счётчиков
+// асинхронный thunk для получения списка счётчиков
 export const fetchMeters = createAsyncThunk(
   'meters/fetchMeters',
   async (address?: string) => {
+    if (USE_MOCK) {
+      const response = await mockApi.mockGetMeters();
+      return response.data as Meter[];
+    }
     const params = address ? { address } : {};
     const response = await axios.get('/api/meters/', { params });
     return response.data.data;
@@ -46,7 +52,6 @@ const metersSlice = createSlice({
   reducers: {
     setSearchAddress: (state, action: PayloadAction<string>) => {
       state.searchAddress = action.payload;
-      // Фильтруем на клиенте (или можно на бэкенде)
       if (action.payload) {
         state.filteredItems = state.items.filter(meter =>
           meter.address.toLowerCase().includes(action.payload.toLowerCase())
@@ -69,7 +74,6 @@ const metersSlice = createSlice({
       .addCase(fetchMeters.fulfilled, (state, action) => {
         state.loading = false;
         state.items = action.payload;
-        // Применяем текущий фильтр к новым данным
         if (state.searchAddress) {
           state.filteredItems = state.items.filter((meter: Meter) =>
             meter.address.toLowerCase().includes(state.searchAddress.toLowerCase())

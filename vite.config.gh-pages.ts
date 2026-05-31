@@ -3,10 +3,7 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: './',
-  define: {
-    'import.meta.env.VITE_IS_TAURI': JSON.stringify(true),
-  },
+  base: '/norvoter-react/',  
   server: {
     port: 5173,
     proxy: {

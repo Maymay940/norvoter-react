@@ -1458,3 +1458,84 @@ td .btn-sm {
 @media (min-width: 993px) {
   .card-col { width: calc(33.333% - 1rem); }  /* 3 колонки */
 }
+
+.filters-wrapper {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.filter-select {
+  background-color: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  padding: 8px 32px 8px 16px;
+  color: white;
+  font-size: 14px;
+  font-family: var(--font-kanit);
+  cursor: pointer;
+  appearance: none;
+  backdrop-filter: blur(8px);
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 18px;
+  transition: all 0.2s ease;
+}
+
+.filter-select:hover {
+  background-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--primary-blue);
+  transform: translateY(-1px);
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(14, 87, 231, 0.3);
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.filter-select option {
+  background-color: #1a1a2e;
+  color: white;
+  padding: 10px;
+}
+
+/* Адаптивность для мобильных устройств */
+@media (max-width: 768px) {
+  .filters-wrapper {
+    gap: 8px;
+    width: 100%;
+    margin-top: 12px;
+  }
+  
+  .filter-select {
+    font-size: 13px;
+    padding: 6px 28px 6px 12px;
+    background-size: 16px;
+    background-position: right 10px center;
+    flex: 1;
+  }
+  
+  .page-header .d-flex {
+    flex-direction: column;
+    align-items: stretch !important;
+    gap: 12px;
+  }
+  
+  .filters-wrapper {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 480px) {
+  .filters-wrapper {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .filter-select {
+    width: 100%;
+  }
+}

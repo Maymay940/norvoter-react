@@ -1,4 +1,3 @@
-// store/index.ts
 import { configureStore } from '@reduxjs/toolkit';
 import axios from 'axios';
 import authReducer from './slices/authSlice';
@@ -10,17 +9,17 @@ import filtersReducer from './slices/filtersSlice';
 
 export const store = configureStore({
   reducer: {
-    auth: authReducer,
-    request: requestReducer,
-    meters: metersReducer,
-    requests: requestsReducer,
-    ui: uiReducer,
-    filters: filtersReducer,
+    auth: authReducer, // управление пользователем (логин, регистрация, сессия)
+    request: requestReducer, // работа с одной заявкой (черновик, детали)
+    meters: metersReducer, // список счетчиков и фильтрация
+    requests: requestsReducer, // список заявок пользователя и админа
+    ui: uiReducer, // глобальное UI состояние (лоадер, модалки, ошибки)
+    filters: filtersReducer, // фильтры для счетчиков (адрес, тип, сортировка)
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       thunk: {
-        extraArgument: { axios },
+        extraArgument: { axios }, // дополнительный аргумент в thunk
       },
     }),
 });
